@@ -23,19 +23,29 @@ constructor(
    private readonly emailService:EMailService
 ){}
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
-const userExist= await this.FindUserByEmail(userSignupDto.email)
-if(userExist) throw new BadRequestException ('this mufuking email isnt available')
+  const search= userSignupDto.email?'email':"phone"
+  const searchValue= userSignupDto.email?
+  userSignupDto.email:userSignupDto.phone?.toString()
+  
+//const userExist= await this.FindUserByEmail(userSignupDto.email?'email':"phone" )
+const userExist = await this.usersRepository.findOne({
+  where: { [search]: searchValue }, 
+  select: ["id"]                    
+});
+if(userExist) throw new BadRequestException (
+  userSignupDto.email?
+  'this mufuking email isnt available': 'no phone number was given')
   
   userSignupDto.password= await hash(userSignupDto.password,10)
 
 
   let user= this.usersRepository.create(userSignupDto)
   user =await  this.usersRepository.save(user)
-  delete user.password
-
+ 
+if(user.email){
   await this.emailService.sendMail({
     
-      recipient: user?.email,
+      recipient: user.email,
       subject:"welcome to our app",
       text:'welcome to ourplartform',
       html:`<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`
@@ -43,6 +53,13 @@ if(userExist) throw new BadRequestException ('this mufuking email isnt available
 
   })
   console.log('✅ Welcome email sent!');
+}
+   delete user.password
+  if(user.email== null || user.email== undefined){
+    delete user.email}
+    if(user.phone== null || user.phone== undefined){
+      delete user.phone
+    }
   return user
 }
 
