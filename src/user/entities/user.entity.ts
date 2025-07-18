@@ -11,8 +11,11 @@ export class UserEntity {
     @Column()
     name:string;
 
-    @Column({unique:true})
+    @Column({unique:true,nullable:true})
     email:string;
+    
+    @Column({nullable:true})
+    phone:string
 
     @Column({select:false})
     password:string;
