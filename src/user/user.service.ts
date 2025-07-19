@@ -23,6 +23,9 @@ constructor(
    private readonly emailService:EMailService
 ){}
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
+  if(!userSignupDto.email && !userSignupDto.phone){
+    throw new BadRequestException("provide either phone or email to sign up")
+  }
   const search= userSignupDto.email?'email':"phone"
   const searchValue= userSignupDto.email?
   userSignupDto.email:userSignupDto.phone?.toString()
@@ -34,7 +37,8 @@ const userExist = await this.usersRepository.findOne({
 });
 if(userExist) throw new BadRequestException (
   userSignupDto.email?
-  'this mufuking email isnt available': 'no phone number was given')
+  'this mufuking email isnt available': 'this number has been taken nigger')
+ 
   
   userSignupDto.password= await hash(userSignupDto.password,10)
 
