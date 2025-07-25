@@ -11,6 +11,7 @@ import { access } from 'fs';
 import { sign } from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { EMailService } from 'src/email/email.service';
+import { extractCountryCode, formatPhoneNumberWithCountryCode, validatePhoneNumber } from 'src/utility/phone.util';
 dotenv.config();
 
 @Injectable()
@@ -39,8 +40,19 @@ if(userExist) throw new BadRequestException (
   userSignupDto.email?
   'this mufuking email isnt available': 'this number has been taken nigger')
  
+  if(userSignupDto.phone){
+    const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
+    if(!PhoneValidation.isValid){
+      throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
+    }
   
+  const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
+    userSignupDto.phone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
+  }
+
+
   userSignupDto.password= await hash(userSignupDto.password,10)
+  
 
 
   let user= this.usersRepository.create(userSignupDto)
