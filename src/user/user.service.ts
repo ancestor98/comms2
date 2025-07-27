@@ -80,16 +80,31 @@ if(user.email){
 }
 
  async signin(signInDto:SignInDto):Promise<UserEntity>{
-  const UserExist=  await this.usersRepository.createQueryBuilder("users")
+   let UserExist: UserEntity | undefined
+
+    if (signInDto.email){
+   UserExist=  await this.usersRepository.createQueryBuilder("users")
   .addSelect('users.password').where("users.email=:email",{email:signInDto.email})
   .getOne();
-  if(!UserExist) throw new BadRequestException("bro you got nothing in here man")
+}else if(signInDto.phone){
+  UserExist=  await this.usersRepository.createQueryBuilder("users")
+  .addSelect('users.password').where("users.phone=:phone",{phone:signInDto.phone})
+  .getOne();
+}else{
+   // This case should ideally be covered by DTO validation, but good as a fallback
+    throw new BadRequestException("Please provide either email or phone number to sign in.");
+  }
+ if(!UserExist) 
+  {throw new BadRequestException("bro you got nothing in here man")
+  }
      const isPasswordValid= await compare(signInDto.password,UserExist.password)
-    if(!isPasswordValid) throw new BadRequestException("bro yoo this password is incorrect man")
-     
+  
+    if(!isPasswordValid) {
+      throw new BadRequestException("bro yoo this password is incorrect man")
+    }
       delete UserExist.password
        return UserExist
-}
+  }
 
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
@@ -179,7 +194,9 @@ console.log('User password in DB:', user.password);
 async accessToken(user:UserEntity):Promise<string>{
  
   return sign({ id:user.id,
-                email:user.email },
+                email:user.email ,
+                phone:user.phone
+              },
                 process.env.ACCESS_TOKEN_SECRET_KEY,
                 {expiresIn:"30m"})
 

@@ -1,18 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
+import { AllowedGuard } from 'src/utility/guards/allowed.guard';
+import { AllowedRoles } from 'src/utility/decorators/allowed-roles.decorator';
+import { CategoriesService } from 'src/categories/categories.service';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(ProductEntity) private readonly productRepository:Repository<ProductEntity>){}
-  
-  async create(createProductDto: CreateProductDto) {
-    //const product=  this.productRepository.create(createProductDto)
-   // return  await this.productRepository.save(product)
+    @InjectRepository(ProductEntity) private readonly productRepository:Repository<ProductEntity>,
+   private readonly categoryService:CategoriesService){}
+  async create(createProductDto: CreateProductDto,currentUser:UserEntity) {
+    const {data:category}= await this.categoryService.findOne(+createProductDto.categoryId)
+    const product=  this.productRepository.create(createProductDto)
+    product.category=category;
+    product.addedBy=currentUser
+    return  await this.productRepository.save(product)
+    
   }
 
   findAll() {

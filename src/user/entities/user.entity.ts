@@ -14,7 +14,7 @@ export class UserEntity {
     @Column({unique:true,nullable:true})
     email:string;
     
-    @Column({nullable:true})
+    @Column({unique:true,nullable:true})
     phone:string
 
     @Column({select:false})
