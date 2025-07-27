@@ -1,9 +1,9 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateProductDto {
     @IsNotEmpty({message:"title can not be empty"})
     @IsString()
-    title:string;
+    tittle:string;
 
     @IsNotEmpty({message:"description can not be empty"})
     @IsString()
@@ -17,11 +17,11 @@ export class CreateProductDto {
     @IsNumber({},{message:"stock should be in number"})
     stock:number;
 
-     @IsNotEmpty({message:"stock  can not be empty"})
+     
      @IsArray({message:'images should be in array format'})
-    imaged:number[]
+    images:string[]
 
      @IsNotEmpty({message:"category can not be empty"})
      @IsNumber({},{message:"category should be in number"})
-     category:number
+     categoryId:number
 }

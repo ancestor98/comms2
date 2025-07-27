@@ -12,7 +12,7 @@ import { CategoryEntity } from './entities/category.entity';
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
-@UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN                            ]))
+@UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN ]))
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto,@CurrentUser()currentuser:UserEntity):Promise<CategoryEntity> {
     return this.categoriesService.create(createCategoryDto,currentuser)

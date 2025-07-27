@@ -5,14 +5,16 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guards';
 import { AllowedGuard } from 'src/utility/guards/allowed.guard';
 import { Roles } from 'src/utility/common/user-role.enum';
+import { CurrentUser } from 'src/utility/decorators/current-userdecorator';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 @UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN]))
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  create(@Body() createProductDto: CreateProductDto,@CurrentUser() currentUser:UserEntity) {
+    return this.productService.create(createProductDto,currentUser);
   }
 
   @Get()
