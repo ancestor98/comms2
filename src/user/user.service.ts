@@ -124,12 +124,30 @@ if(user.email){
 }
 
 
- update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+ async update(userId: number, updateUserDto:Partial <UpdateUserDto>) {
+   console.log('DEBUG: Incoming updateUserDto:', updateUserDto);
+  console.log('DEBUG: Incoming userId:', userId);
+
+  const user= await this.findOne(userId)
+   console.log('DEBUG: User fetched from DB (before assign):', user);
+
+
+  if(!user)
+  throw new BadRequestException("no userfound")
+  Object.assign(user,updateUserDto)
+   console.log('DEBUG: User object after Object.assign (before save):', user);
+
+
+  await this.usersRepository.save(user)
+  console.log('DEBUG: User object after save (final log):', user);
+
+
+  console.log(user)
+    return  `User #${userId} updated successfully`;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return `This action removes a #${id} updated `;
   }
 
   FindUserByEmail(email:string){
