@@ -43,8 +43,7 @@ async findOne(@Param('id') id: string): Promise<UserEntity> {
 }
 
 @Patch(':id/change-password')
-async changePassWord(@Param("id", ParseIntPipe)id:number,
-@Body() changePassWord :ChangePasswordDto):Promise<{  message: string }>{
+async changePassWord(@Param("id", ParseIntPipe)id:number,@Body() changePassWord :ChangePasswordDto):Promise<{  message: string }>{
 
  return await this.userService.changePassword(id,
   changePassWord.oldPassword,
@@ -56,10 +55,12 @@ async changePassWord(@Param("id", ParseIntPipe)id:number,
 }
 
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+ @Patch(':userId')
+update(@Param('userId') userId: string, @Body() body, @Body() updateUserDto: UpdateUserDto) {
+  console.log('Raw body:', body); // <-- should NOT be empty
+  console.log('Parsed DTO:', updateUserDto);
+  return this.userService.update(+userId, updateUserDto);
+}
 
   @Delete(':id')
   remove(@Param('id') id: string) {

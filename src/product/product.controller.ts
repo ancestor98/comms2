@@ -7,6 +7,7 @@ import { AllowedGuard } from 'src/utility/guards/allowed.guard';
 import { Roles } from 'src/utility/common/user-role.enum';
 import { CurrentUser } from 'src/utility/decorators/current-userdecorator';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { ProductEntity } from './entities/product.entity';
 
 @Controller('product')
 export class ProductController {
@@ -18,7 +19,7 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
+  findAll():Promise<ProductEntity[]> {
     return this.productService.findAll();
   }
 
@@ -26,10 +27,10 @@ export class ProductController {
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
-
+@UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN]))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto,@CurrentUser()currentuser:UserEntity) {
+    return this.productService.update(+id, updateProductDto,currentuser);
   }
 
   @Delete(':id')
