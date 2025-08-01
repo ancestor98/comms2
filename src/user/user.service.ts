@@ -28,6 +28,7 @@ async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
     throw new BadRequestException("provide either phone or email to sign up")
   }
   const search= userSignupDto.email?'email':"phone"
+  
   const searchValue= userSignupDto.email?
   userSignupDto.email:userSignupDto.phone?.toString()
   

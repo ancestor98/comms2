@@ -5,6 +5,7 @@ import{config} from 'dotenv'
 import { UserEntity } from 'src/user/entities/user.entity';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { ProductEntity } from 'src/product/entities/product.entity';
+import { ReviewEntity } from 'src/review/entities/review.entity';
 
 config()
 
@@ -17,7 +18,7 @@ export const dataSourceOption:DataSourceOptions={
   username: 'neondb_owner',
   password: "npg_jQ21TNsadGhR",
   database: 'neondb',
-  entities: [UserEntity,CategoryEntity,ProductEntity] ,//[__dirname + '/**/*.entity{.ts,.js}'],
+  entities: [UserEntity,CategoryEntity,ProductEntity,ReviewEntity] ,//[__dirname + '/**/*.entity{.ts,.js}'],
   synchronize: true,
   ssl: {
     rejectUnauthorized: false, // Required for Neon SSL connections
