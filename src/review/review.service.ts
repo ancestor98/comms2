@@ -50,28 +50,59 @@ export class ReviewService {
    
 
  }catch(error){
-  throw new  Error("Failed to create or update review")
-
+  console.error('Review creation error:', error);
+  throw new Error('Failed to create or update review');
  }
 }
 
-    
+//find all reReviewviews about a ptoduct
+async allproductReviws(id:number,):Promise<ReviewEntity[]>{
+
+  const product = await this .productService.findOne(id)
+   if (!product) {
+    throw new NotFoundException('Product not found');
+  }
+  return await this.reviewRespository.find({
+    where:{
+      product:{id},
+    },relations:{
+      user:true,
+      product:{
+        category:true
+      }
+
+    }
+
+  })
+
+}
   
 
   findAll() {
     return `This action returns all review`;
   }
 
- async findOne(id: number) {
-    //return  await this.
+ async findOne(id: number):Promise<ReviewEntity> {
+ const review=   await this.reviewRespository.findOne({
+      where:{id},
+      relations:{
+        user:true,
+        product:{
+          category:true
+        }
+      }
+    })
+    if(!review) throw new NotFoundException("reviw not found")
+      return review
   }
 
   update(id: number, updateReviewDto: UpdateReviewDto) {
     return `This action updates a #${id} review`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async remove(id: number) {
+    const review= await this.findOne(id)
+    return this.reviewRespository.remove(review)
   }
 
 

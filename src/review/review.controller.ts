@@ -14,7 +14,7 @@ import { Roles } from 'src/utility/common/user-role.enum';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 @UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN]))
-  @Post()
+  @Post("creatReview")
  // create(@Body() createReviewDto: CreateReviewDto) {
   async create(@Body() body: { productId: number; ratings: string; comment: string },@CurrentUser() currentUser:UserEntity) :Promise<ReviewEntity>{
     return this.reviewService.createReview(body,currentUser);
@@ -24,6 +24,11 @@ export class ReviewController {
   findAll() {
     return this.reviewService.findAll();
   }
+  @Get()
+async allproductReviws(@Body("productId") productId:number){
+  return await this.reviewService.allproductReviws(productId)
+}
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
