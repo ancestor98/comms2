@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { sign } from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { EMailService } from 'src/email/email.service';
 import { extractCountryCode, formatPhoneNumberWithCountryCode, validatePhoneNumber } from 'src/utility/phone.util';
+import { handleAndThrowError } from 'src/utility/error.util';
 dotenv.config();
 
 @Injectable()
@@ -24,32 +25,57 @@ constructor(
    private readonly emailService:EMailService
 ){}
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
+  
   if(!userSignupDto.email && !userSignupDto.phone){
     throw new BadRequestException("provide either phone or email to sign up")
+  }
+
+  
+  if(userSignupDto.phone){
+    const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
+    if(!PhoneValidation.isValid){
+      throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
+    }
+    const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
+   const  formattedphone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
+    userSignupDto.phone= formattedphone
+  
   }
   const search= userSignupDto.email?'email':"phone"
   
   const searchValue= userSignupDto.email?
   userSignupDto.email:userSignupDto.phone?.toString()
   
-//const userExist= await this.FindUserByEmail(userSignupDto.email?'email':"phone" )
+
 const userExist = await this.usersRepository.findOne({
   where: { [search]: searchValue }, 
   select: ["id"]                    
 });
-if(userExist) throw new BadRequestException (
-  userSignupDto.email?
-  'this mufuking email isnt available': 'this number has been taken nigger')
- 
-  if(userSignupDto.phone){
-    const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
-    if(!PhoneValidation.isValid){
-      throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
-    }
+ if(userExist) {
+  const messge= userSignupDto.email 
+?"this mufuking email isnt available"
+:"this number has been taken"
   
-  const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
-    userSignupDto.phone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
-  }
+  
+  return handleAndThrowError(
+    
+    new HttpException(messge,HttpStatus.BAD_REQUEST,)
+
+  );
+ }
+  //throw new BadRequestException (
+//   userSignupDto.email?
+//   'this mufuking email isnt available': 'this number has been taken nigger')
+ 
+  // if(userSignupDto.phone){
+  //   const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
+  //   if(!PhoneValidation.isValid){
+  //     throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
+  //   }
+  
+  // const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
+  //   userSignupDto.phone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
+  // }
 
 
   userSignupDto.password= await hash(userSignupDto.password,10)
