@@ -7,11 +7,45 @@ import { EmailModule } from './email/email.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
+import {  LoggerModule } from 'nestjs-pino';
+import { ConfigModule } from '@nestjs/config';
+import sentryConfig from './config/sentry.config';
+import { SentryTrackerService } from './utility/sentry-traker.service ';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOption),UserModule, EmailModule, CategoriesModule, ProductModule, ReviewModule],
+  imports: [
+    ConfigModule.forRoot({
+       isGlobal: true,
+       load: [sentryConfig]
+
+    }),
+     TypeOrmModule.forRoot(dataSourceOption)
+    ,UserModule,
+     EmailModule,
+      CategoriesModule,
+       ProductModule,
+        ReviewModule,
+    LoggerModule.forRoot({
+      pinoHttp:{
+        autoLogging:false,
+        level:"debug",
+        transport:{
+          target:"pino-pretty",
+          options:{
+            colorize:true,
+            translateTime:'SYS:standard'
+          }
+        }
+      }
+
+    }),
+    AuthModule
+  ],
   controllers: [],
-  providers: [],
+  providers: [
+    SentryTrackerService
+  ],
 })
 export class AppModule {
 

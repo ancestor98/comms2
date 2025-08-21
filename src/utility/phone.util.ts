@@ -1,4 +1,6 @@
+import { BadRequestException } from "@nestjs/common";
 import { error } from "console";
+import { NotFoundError } from "rxjs";
 import { COUNTRY_CODES, CountryCode, CountryInfo, DEFAULT_COUNTRY_CODE } from "src/constant/country.constant";
 
 export function extractCountryCode(phoneNumber: string): {
@@ -232,4 +234,14 @@ export function validatePhoneNumber(
       error: 'Invalid phone number format',
     };
   }
+}
+
+
+
+  export function normalizePhoneNumber(phoneNumber:string): string{
+    const{countryCode,localNumber,isValid}= extractCountryCode(phoneNumber);
+    if(!isValid) {throw new BadRequestException("unable to parse format")
+
+    }
+  return formatPhoneNumberWithCountryCode(countryCode,localNumber)
 }

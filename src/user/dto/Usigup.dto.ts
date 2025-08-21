@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 export class UserSignupDto{
      
@@ -13,6 +13,9 @@ export class UserSignupDto{
      
     @IsOptional()
     @IsNotEmpty({message:"phone must not  be empty"})
+     @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+     message: 'Password entered is weak',
+  })
     phone:string
 
 
