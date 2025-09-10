@@ -11,7 +11,8 @@ import {  LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
 import sentryConfig from './config/sentry.config';
 import { SentryTrackerService } from './utility/sentry-traker.service ';
-import { AuthModule } from './auth/auth.module';
+//import { AuthModule } from './auth/auth.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { AuthModule } from './auth/auth.module';
       }
 
     }),
-    AuthModule
+    //AuthModule,
+    UploadModule
   ],
   controllers: [],
   providers: [

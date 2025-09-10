@@ -13,6 +13,7 @@ const user_controller_1 = require("./user.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const email_module_1 = require("../email/email.module");
+const central_logger_1 = require("../utility/logger/central-logger");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
@@ -22,7 +23,7 @@ exports.UserModule = UserModule = __decorate([
             email_module_1.EmailModule
         ],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService],
+        providers: [user_service_1.UserService, central_logger_1.CentralLoggerService],
         exports: [user_service_1.UserService]
     })
 ], UserModule);

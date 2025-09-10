@@ -1,4 +1,6 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { GenderUser } from "src/utility/common/user-role.enum";
+
 
 export class UserSignupDto{
      
@@ -12,13 +14,17 @@ export class UserSignupDto{
      email:string
      
     @IsOptional()
-    @IsNotEmpty({message:"phone must not  be empty"})
-     @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-     message: 'Password entered is weak',
-  })
-    phone:string
+     @IsString({message:"phone must be a string"})
+     phone:string
 
+     @IsOptional()
+     @IsEnum(GenderUser)
+     gender:GenderUser
 
+      @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+      message: 'Password entered is weak'})
+     @MaxLength(32)
+     @MinLength(8)
      @IsNotEmpty({message:"password must  not be empty"})
      password:string
 
