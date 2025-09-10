@@ -9,10 +9,13 @@ import { hash,compare } from "bcrypt"
 import { SignInDto } from './dto/SigninDto';
 import { access } from 'fs';
 import { sign } from 'jsonwebtoken';
+import * as argon from 'argon2';
+
 import * as dotenv from 'dotenv';
 import { EMailService } from 'src/email/email.service';
 import { extractCountryCode, formatPhoneNumberWithCountryCode, validatePhoneNumber } from 'src/utility/phone.util';
 import { handleAndThrowError } from 'src/utility/error.util';
+import { CentralLoggerService } from 'src/utility/logger/central-logger';
 dotenv.config();
 
 @Injectable()
@@ -22,16 +25,15 @@ export class UserService {
 constructor(
   @InjectRepository(UserEntity)
    private usersRepository:Repository<UserEntity>,
-   private readonly emailService:EMailService
+   private readonly emailService:EMailService,
+   private readonly centralogger:CentralLoggerService
 ){}
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
   
   if(!userSignupDto.email && !userSignupDto.phone){
     throw new BadRequestException("provide either phone or email to sign up")
   }
-
-  
-  if(userSignupDto.phone){
+if(userSignupDto.phone){
     const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
     if(!PhoneValidation.isValid){
       throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
@@ -39,50 +41,42 @@ async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
     const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
    const  formattedphone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
     userSignupDto.phone= formattedphone
-  
   }
   const search= userSignupDto.email?'email':"phone"
-  
-  const searchValue= userSignupDto.email?
+   const searchValue= userSignupDto.email?
   userSignupDto.email:userSignupDto.phone?.toString()
   
-
-const userExist = await this.usersRepository.findOne({
+  const userExist = await this.usersRepository.findOne({
   where: { [search]: searchValue }, 
-  select: ["id"]                    
+  select: ["id","deletedAt",'email','phone'],   
+  withDeleted:true //helps  softdelete
+                  
 });
+if (userExist && userExist.deletedAt)
+  this.centralogger.logUser(
+'Found soft-deleted user with same email, allowing recreation',
+{
+  userExistId:userExist.id,
+  deletedAT:userExist.deletedAt
+}
+
+  );
+
+
  if(userExist) {
   const messge= userSignupDto.email 
 ?"this mufuking email isnt available"
 :"this number has been taken"
   
-  
   return handleAndThrowError(
-    
     new HttpException(messge,HttpStatus.BAD_REQUEST,)
 
   );
  }
-  //throw new BadRequestException (
-//   userSignupDto.email?
-//   'this mufuking email isnt available': 'this number has been taken nigger')
- 
-  // if(userSignupDto.phone){
-  //   const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
-  //   if(!PhoneValidation.isValid){
-  //     throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
-  //   }
   
-  // const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
-  //   userSignupDto.phone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
-  // }
-
-
-  userSignupDto.password= await hash(userSignupDto.password,10)
+userSignupDto.password= await argon.hash(userSignupDto.password)
   
-
-
-  let user= this.usersRepository.create(userSignupDto)
+let user= this.usersRepository.create(userSignupDto)
   user =await  this.usersRepository.save(user)
  
 if(user.email){

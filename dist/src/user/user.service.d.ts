@@ -5,10 +5,12 @@ import { UserEntity } from './entities/user.entity';
 import { UserSignupDto } from './dto/Usigup.dto';
 import { SignInDto } from './dto/SigninDto';
 import { EMailService } from 'src/email/email.service';
+import { CentralLoggerService } from 'src/utility/logger/central-logger';
 export declare class UserService {
     private usersRepository;
     private readonly emailService;
-    constructor(usersRepository: Repository<UserEntity>, emailService: EMailService);
+    private readonly centralogger;
+    constructor(usersRepository: Repository<UserEntity>, emailService: EMailService, centralogger: CentralLoggerService);
     signup(userSignupDto: UserSignupDto): Promise<UserEntity>;
     signin(signInDto: SignInDto): Promise<UserEntity>;
     create(createUserDto: CreateUserDto): string;

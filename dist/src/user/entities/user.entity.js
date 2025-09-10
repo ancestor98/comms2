@@ -35,6 +35,10 @@ __decorate([
     __metadata("design:type", String)
 ], UserEntity.prototype, "phone", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'enum', enum: user_role_enum_1.GenderUser, default: user_role_enum_1.GenderUser.NOT_PASSED }),
+    __metadata("design:type", String)
+], UserEntity.prototype, "gender", void 0);
+__decorate([
     (0, typeorm_1.Column)({ select: false }),
     __metadata("design:type", String)
 ], UserEntity.prototype, "password", void 0);
@@ -50,6 +54,10 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", typeorm_1.Timestamp)
 ], UserEntity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)(),
+    __metadata("design:type", Date)
+], UserEntity.prototype, "deletedAt", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => category_entity_1.CategoryEntity, (cat) => cat.addedBy),
     __metadata("design:type", category_entity_1.CategoryEntity)

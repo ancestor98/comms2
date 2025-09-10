@@ -11,3 +11,4 @@ export declare function validatePhoneNumber(phoneNumber: string, countryCode?: s
     error?: string;
     countryInfo?: CountryInfo;
 };
+export declare function normalizePhoneNumber(phoneNumber: string): string;

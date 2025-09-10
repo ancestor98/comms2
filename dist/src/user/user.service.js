@@ -19,15 +19,18 @@ const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = require("jsonwebtoken");
+const argon = require("argon2");
 const dotenv = require("dotenv");
 const email_service_1 = require("../email/email.service");
 const phone_util_1 = require("../utility/phone.util");
 const error_util_1 = require("../utility/error.util");
+const central_logger_1 = require("../utility/logger/central-logger");
 dotenv.config();
 let UserService = class UserService {
-    constructor(usersRepository, emailService) {
+    constructor(usersRepository, emailService, centralogger) {
         this.usersRepository = usersRepository;
         this.emailService = emailService;
+        this.centralogger = centralogger;
     }
     async signup(userSignupDto) {
         if (!userSignupDto.email && !userSignupDto.phone) {
@@ -47,15 +50,21 @@ let UserService = class UserService {
             userSignupDto.email : userSignupDto.phone?.toString();
         const userExist = await this.usersRepository.findOne({
             where: { [search]: searchValue },
-            select: ["id"]
+            select: ["id", "deletedAt", 'email', 'phone'],
+            withDeleted: true
         });
+        if (userExist && userExist.deletedAt)
+            this.centralogger.logUser('Found soft-deleted user with same email, allowing recreation', {
+                userExistId: userExist.id,
+                deletedAT: userExist.deletedAt
+            });
         if (userExist) {
             const messge = userSignupDto.email
                 ? "this mufuking email isnt available"
                 : "this number has been taken";
             return (0, error_util_1.handleAndThrowError)(new common_1.HttpException(messge, common_1.HttpStatus.BAD_REQUEST));
         }
-        userSignupDto.password = await (0, bcrypt_1.hash)(userSignupDto.password, 10);
+        userSignupDto.password = await argon.hash(userSignupDto.password);
         let user = this.usersRepository.create(userSignupDto);
         user = await this.usersRepository.save(user);
         if (user.email) {
@@ -168,6 +177,7 @@ exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        email_service_1.EMailService])
+        email_service_1.EMailService,
+        central_logger_1.CentralLoggerService])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSignupDto = void 0;
 const class_validator_1 = require("class-validator");
+const user_role_enum_1 = require("../../utility/common/user-role.enum");
 class UserSignupDto {
 }
 exports.UserSignupDto = UserSignupDto;
@@ -26,10 +27,20 @@ __decorate([
 ], UserSignupDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)({ message: "phone must not  be empty" }),
+    (0, class_validator_1.IsString)({ message: "phone must be a string" }),
     __metadata("design:type", String)
 ], UserSignupDto.prototype, "phone", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(user_role_enum_1.GenderUser),
+    __metadata("design:type", String)
+], UserSignupDto.prototype, "gender", void 0);
+__decorate([
+    (0, class_validator_1.Matches)(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+        message: 'Password entered is weak'
+    }),
+    (0, class_validator_1.MaxLength)(32),
+    (0, class_validator_1.MinLength)(8),
     (0, class_validator_1.IsNotEmpty)({ message: "password must  not be empty" }),
     __metadata("design:type", String)
 ], UserSignupDto.prototype, "password", void 0);

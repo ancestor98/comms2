@@ -1,8 +1,8 @@
 import { CategoryEntity } from "src/categories/entities/category.entity";
 import { ProductEntity } from "src/product/entities/product.entity";
 import { ReviewEntity } from "src/review/entities/review.entity";
-import { Roles } from "src/utility/common/user-role.enum";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+import { GenderUser, Roles } from "src/utility/common/user-role.enum";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 
 @Entity("users")
 export class UserEntity {
@@ -18,6 +18,9 @@ export class UserEntity {
     @Column({unique:true,nullable:true})
     phone:string
 
+   @Column({type:'enum',enum:GenderUser,default:GenderUser.NOT_PASSED})
+    gender:GenderUser
+
     @Column({select:false})
     password:string;
     
@@ -29,6 +32,9 @@ export class UserEntity {
 
     @UpdateDateColumn()
      updatedAt:Timestamp
+
+     @DeleteDateColumn()
+     deletedAt:Date
 
 
   @OneToMany(()=>CategoryEntity,(cat)=>cat.addedBy)

@@ -20,6 +20,7 @@ const nestjs_pino_1 = require("nestjs-pino");
 const config_1 = require("@nestjs/config");
 const sentry_config_1 = require("./config/sentry.config");
 const sentry_traker_service_1 = require("./utility/sentry-traker.service ");
+const upload_module_1 = require("./upload/upload.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -53,7 +54,8 @@ exports.AppModule = AppModule = __decorate([
                         }
                     }
                 }
-            })
+            }),
+            upload_module_1.UploadModule
         ],
         controllers: [],
         providers: [

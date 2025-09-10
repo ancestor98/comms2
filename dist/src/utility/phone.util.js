@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractCountryCode = extractCountryCode;
 exports.formatPhoneNumberWithCountryCode = formatPhoneNumberWithCountryCode;
 exports.validatePhoneNumber = validatePhoneNumber;
+exports.normalizePhoneNumber = normalizePhoneNumber;
+const common_1 = require("@nestjs/common");
 const country_constant_1 = require("../constant/country.constant");
 function extractCountryCode(phoneNumber) {
     try {
@@ -154,5 +156,12 @@ function validatePhoneNumber(phoneNumber, countryCode) {
             error: 'Invalid phone number format',
         };
     }
+}
+function normalizePhoneNumber(phoneNumber) {
+    const { countryCode, localNumber, isValid } = extractCountryCode(phoneNumber);
+    if (!isValid) {
+        throw new common_1.BadRequestException("unable to parse format");
+    }
+    return formatPhoneNumberWithCountryCode(countryCode, localNumber);
 }
 //# sourceMappingURL=phone.util.js.map
