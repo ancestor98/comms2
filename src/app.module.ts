@@ -13,7 +13,12 @@ import sentryConfig from './config/sentry.config';
 import { SentryTrackerService } from './utility/sentry-traker.service ';
 //import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventEmitterDefaultConfigOptions } from './utility/event.util';
 
+const EventsEmitterModulesLoader= EventEmitterModule.forRoot(
+  EventEmitterDefaultConfigOptions
+);
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +32,7 @@ import { UploadModule } from './upload/upload.module';
       CategoriesModule,
        ProductModule,
         ReviewModule,
+        EventsEmitterModulesLoader,
     LoggerModule.forRoot({
       pinoHttp:{
         autoLogging:false,
