@@ -28,6 +28,7 @@ constructor(
    private readonly emailService:EMailService,
    private readonly centralogger:CentralLoggerService
 ){}
+
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
   
   if(!userSignupDto.email && !userSignupDto.phone){
@@ -70,16 +71,13 @@ if (userExist && userExist.deletedAt)
   
   return handleAndThrowError(
     new HttpException(messge,HttpStatus.BAD_REQUEST,)
-
   );
  }
   
 userSignupDto.password= await argon.hash(userSignupDto.password)
-  
-let user= this.usersRepository.create(userSignupDto)
+  let user= this.usersRepository.create(userSignupDto)
   user =await  this.usersRepository.save(user)
- 
-if(user.email){
+ if(user.email){
   await this.emailService.sendMail({
     
       recipient: user.email,
