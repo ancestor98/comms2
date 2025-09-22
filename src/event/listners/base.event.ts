@@ -1,12 +1,12 @@
 export class BaseEvent<T> {
-    constructor(private readonly data: T|T[]){}
+    constructor(private readonly data: T){}
     toString(){
         return JSON.stringify({
             data:this.data,
 
         });
     }
-    toJSON():T|T[]{
+    toJSON():T{
         return this.data
     }
 }

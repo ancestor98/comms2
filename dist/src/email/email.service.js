@@ -32,13 +32,14 @@ let EMailService = class EMailService {
         });
     }
     async sendMail(dto) {
-        const { recipient, subject, text, html } = dto;
+        const { recipient, subject, text, html, timestamp } = dto;
         const options = {
             from: this.configService.get('EMAIL_USER'),
             to: recipient,
             subject,
             text,
             html,
+            timestamp
         };
         try {
             const info = await this.transporter.sendMail(options);

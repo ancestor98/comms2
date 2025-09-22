@@ -16,9 +16,7 @@ import { UploadModule } from './upload/upload.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { EventEmitterDefaultConfigOptions } from './utility/event.util';
 
-const EventsEmitterModulesLoader= EventEmitterModule.forRoot(
-  EventEmitterDefaultConfigOptions
-);
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,7 +30,8 @@ const EventsEmitterModulesLoader= EventEmitterModule.forRoot(
       CategoriesModule,
        ProductModule,
         ReviewModule,
-        EventsEmitterModulesLoader,
+        
+        EventEmitterModule.forRoot( EventEmitterDefaultConfigOptions),
     LoggerModule.forRoot({
       pinoHttp:{
         autoLogging:false,

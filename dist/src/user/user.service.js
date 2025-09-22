@@ -25,12 +25,15 @@ const email_service_1 = require("../email/email.service");
 const phone_util_1 = require("../utility/phone.util");
 const error_util_1 = require("../utility/error.util");
 const central_logger_1 = require("../utility/logger/central-logger");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const emailtrigger_1 = require("../event/listners/emailtrigger");
 dotenv.config();
 let UserService = class UserService {
-    constructor(usersRepository, emailService, centralogger) {
+    constructor(usersRepository, emailService, centralogger, eventEmiter) {
         this.usersRepository = usersRepository;
         this.emailService = emailService;
         this.centralogger = centralogger;
+        this.eventEmiter = eventEmiter;
     }
     async signup(userSignupDto) {
         if (!userSignupDto.email && !userSignupDto.phone) {
@@ -68,13 +71,13 @@ let UserService = class UserService {
         let user = this.usersRepository.create(userSignupDto);
         user = await this.usersRepository.save(user);
         if (user.email) {
-            await this.emailService.sendMail({
-                recipient: user.email,
+            this.eventEmiter.emit(emailtrigger_1.EMAIL_ACTIVITY_TRIGGERD, new emailtrigger_1.ActivityEmailTriggergEvent({
+                email: user.email,
                 subject: "welcome to our app",
                 text: 'welcome to ourplartform',
-                html: `<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`
-            });
-            console.log('✅ Welcome email sent!');
+                html: `<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`,
+                timestamp: new Date()
+            }));
         }
         delete user.password;
         if (user.email == null || user.email == undefined) {
@@ -178,6 +181,7 @@ exports.UserService = UserService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         email_service_1.EMailService,
-        central_logger_1.CentralLoggerService])
+        central_logger_1.CentralLoggerService,
+        event_emitter_1.EventEmitter2])
 ], UserService);
 //# sourceMappingURL=user.service.js.map
