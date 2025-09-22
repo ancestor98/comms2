@@ -15,4 +15,8 @@ export class SendEmailDto {
   @IsOptional()
   @IsString()
   html?: string;
+
+@IsOptional()
+@IsString()
+ timestamp?: Date;
 }

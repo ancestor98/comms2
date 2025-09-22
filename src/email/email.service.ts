@@ -25,7 +25,7 @@ export class EMailService {
   }
 
   async sendMail(dto: SendEmailDto): Promise<boolean> {
-    const { recipient, subject, text, html } = dto;
+    const { recipient, subject, text, html,timestamp } = dto;
 
     const options: nodemailer.SendMailOptions = {
       from: this.configService.get<string>('EMAIL_USER'),
@@ -33,6 +33,7 @@ export class EMailService {
       subject,
       text,
       html,
+      timestamp
     };
 
     try {

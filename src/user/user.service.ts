@@ -16,6 +16,8 @@ import { EMailService } from 'src/email/email.service';
 import { extractCountryCode, formatPhoneNumberWithCountryCode, validatePhoneNumber } from 'src/utility/phone.util';
 import { handleAndThrowError } from 'src/utility/error.util';
 import { CentralLoggerService } from 'src/utility/logger/central-logger';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ActivityEmailTriggergEvent, EMAIL_ACTIVITY_TRIGGERD } from 'src/event/listners/emailtrigger';
 dotenv.config();
 
 @Injectable()
@@ -26,7 +28,8 @@ constructor(
   @InjectRepository(UserEntity)
    private usersRepository:Repository<UserEntity>,
    private readonly emailService:EMailService,
-   private readonly centralogger:CentralLoggerService
+   private readonly centralogger:CentralLoggerService,
+   private readonly eventEmiter:EventEmitter2
 ){}
 
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
@@ -78,17 +81,34 @@ userSignupDto.password= await argon.hash(userSignupDto.password)
   let user= this.usersRepository.create(userSignupDto)
   user =await  this.usersRepository.save(user)
  if(user.email){
-  await this.emailService.sendMail({
-    
-      recipient: user.email,
+  this.eventEmiter.emit(
+    EMAIL_ACTIVITY_TRIGGERD,
+    new ActivityEmailTriggergEvent({
+      email:user.email,
       subject:"welcome to our app",
       text:'welcome to ourplartform',
-      html:`<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`
+      html:`<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`,
+      timestamp:new Date()
     
 
-  })
-  console.log('✅ Welcome email sent!');
-}
+
+
+    })
+
+  )
+
+
+//   await this.emailService.sendMail({
+    
+//       recipient: user.email,
+//       subject:"welcome to our app",
+//       text:'welcome to ourplartform',
+//       html:`<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`
+    
+
+//   })
+//   console.log('✅ Welcome email sent!');
+ }
    delete user.password
   if(user.email== null || user.email== undefined){
     delete user.email}

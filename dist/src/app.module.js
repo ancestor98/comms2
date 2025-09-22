@@ -21,6 +21,8 @@ const config_1 = require("@nestjs/config");
 const sentry_config_1 = require("./config/sentry.config");
 const sentry_traker_service_1 = require("./utility/sentry-traker.service ");
 const upload_module_1 = require("./upload/upload.module");
+const event_emitter_1 = require("@nestjs/event-emitter");
+const event_util_1 = require("./utility/event.util");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -42,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             categories_module_1.CategoriesModule,
             product_module_1.ProductModule,
             review_module_1.ReviewModule,
+            event_emitter_1.EventEmitterModule.forRoot(event_util_1.EventEmitterDefaultConfigOptions),
             nestjs_pino_1.LoggerModule.forRoot({
                 pinoHttp: {
                     autoLogging: false,

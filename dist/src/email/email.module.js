@@ -11,12 +11,14 @@ const common_1 = require("@nestjs/common");
 const email_service_1 = require("./email.service");
 const email_controller_1 = require("./email.controller");
 const config_1 = require("@nestjs/config");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let EmailModule = class EmailModule {
 };
 exports.EmailModule = EmailModule;
 exports.EmailModule = EmailModule = __decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule,
+            event_emitter_1.EventEmitterModule
         ],
         controllers: [email_controller_1.EmailController],
         providers: [email_service_1.EMailService],

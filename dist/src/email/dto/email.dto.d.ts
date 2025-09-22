@@ -3,4 +3,5 @@ export declare class SendEmailDto {
     subject: string;
     text: string;
     html?: string;
+    timestamp?: Date;
 }
