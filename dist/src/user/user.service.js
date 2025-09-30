@@ -42,7 +42,7 @@ let UserService = class UserService {
         if (userSignupDto.phone) {
             const PhoneValidation = (0, phone_util_1.validatePhoneNumber)(userSignupDto.phone);
             if (!PhoneValidation.isValid) {
-                throw new common_1.BadRequestException("phone  number is not good you know") || "invalid phonenumber";
+                this.centralogger.logUserError("phone  number is not good", new Error("phone Validation Failed"), { phone: userSignupDto.phone });
             }
             const { countryCode, localNumber } = (0, phone_util_1.extractCountryCode)(userSignupDto.phone);
             const formattedphone = (0, phone_util_1.formatPhoneNumberWithCountryCode)(countryCode, localNumber);
@@ -59,7 +59,7 @@ let UserService = class UserService {
         if (userExist && userExist.deletedAt)
             this.centralogger.logUser('Found soft-deleted user with same email, allowing recreation', {
                 userExistId: userExist.id,
-                deletedAT: userExist.deletedAt
+                deletedAT: userExist.deletedAt,
             });
         if (userExist) {
             const messge = userSignupDto.email

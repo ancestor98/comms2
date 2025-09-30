@@ -21,9 +21,7 @@ import { ActivityEmailTriggergEvent, EMAIL_ACTIVITY_TRIGGERD } from 'src/event/l
 dotenv.config();
 
 @Injectable()
-
 export class UserService {
-
 constructor(
   @InjectRepository(UserEntity)
    private usersRepository:Repository<UserEntity>,
@@ -33,19 +31,22 @@ constructor(
 ){}
 
 async signup(userSignupDto:UserSignupDto):Promise<UserEntity>{
-  
   if(!userSignupDto.email && !userSignupDto.phone){
     throw new BadRequestException("provide either phone or email to sign up")
   }
 if(userSignupDto.phone){
     const PhoneValidation= validatePhoneNumber(userSignupDto.phone);
     if(!PhoneValidation.isValid){
-      throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
-    }
+      this.centralogger.logUserError("phone  number is not good",
+        new Error("phone Validation Failed"),{phone:userSignupDto.phone})
+
+     // throw new BadRequestException("phone  number is not good you know")||"invalid phonenumber"
+}
     const { countryCode, localNumber } = extractCountryCode(userSignupDto.phone);
    const  formattedphone = formatPhoneNumberWithCountryCode(countryCode, localNumber);
     userSignupDto.phone= formattedphone
   }
+  // Check for existing user
   const search= userSignupDto.email?'email':"phone"
    const searchValue= userSignupDto.email?
   userSignupDto.email:userSignupDto.phone?.toString()
@@ -56,16 +57,14 @@ if(userSignupDto.phone){
   withDeleted:true //helps  softdelete
                   
 });
+// 4. Handle existing user scenarios
 if (userExist && userExist.deletedAt)
   this.centralogger.logUser(
 'Found soft-deleted user with same email, allowing recreation',
 {
   userExistId:userExist.id,
-  deletedAT:userExist.deletedAt
-}
-
-  );
-
+  deletedAT:userExist.deletedAt,
+  });
 
  if(userExist) {
   const messge= userSignupDto.email 
@@ -76,7 +75,7 @@ if (userExist && userExist.deletedAt)
     new HttpException(messge,HttpStatus.BAD_REQUEST,)
   );
  }
-  
+   //5. Hash password and create user
 userSignupDto.password= await argon.hash(userSignupDto.password)
   let user= this.usersRepository.create(userSignupDto)
   user =await  this.usersRepository.save(user)
@@ -89,13 +88,7 @@ userSignupDto.password= await argon.hash(userSignupDto.password)
       text:'welcome to ourplartform',
       html:`<h2>Welcome!</h2><p>Thank you for signing up with us.</p>`,
       timestamp:new Date()
-    
-
-
-
-    })
-
-  )
+     }) )
 
 
 //   await this.emailService.sendMail({
@@ -116,8 +109,6 @@ userSignupDto.password= await argon.hash(userSignupDto.password)
       delete user.phone
     }
   return user
-
-
 }
 
 
