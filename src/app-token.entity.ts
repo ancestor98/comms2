@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export interface AppTokenAttributes{
-    id:string;
-    identifierId:string;
-    identifierType:string;
+  id:string;
+  identifierId:string;
+  identifierType:string;
   purpose: string;
   token?: string;
   code?:string;

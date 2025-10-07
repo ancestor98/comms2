@@ -12,6 +12,7 @@ import { ProductEntity } from './entities/product.entity';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+  
 @UseGuards(AuthenticationGuard,AllowedGuard([Roles.ADMIN]))
   @Post("creatproducts")
   create(@Body() createProductDto: CreateProductDto,@CurrentUser() currentUser:UserEntity) {
