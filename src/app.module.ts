@@ -11,7 +11,7 @@ import {  LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
 import sentryConfig from './config/sentry.config';
 import { SentryTrackerService } from './utility/sentry-traker.service ';
-//import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { EventEmitterDefaultConfigOptions } from './utility/event.util';
@@ -46,7 +46,7 @@ import { EventEmitterDefaultConfigOptions } from './utility/event.util';
       }
 
     }),
-    //AuthModule,
+    AuthModule,
     UploadModule
   ],
   controllers: [],

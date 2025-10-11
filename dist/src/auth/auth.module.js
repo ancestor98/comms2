@@ -9,22 +9,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const auth_service_1 = require("./auth.service");
 const jwt_1 = require("@nestjs/jwt");
-const security_config_1 = require("../config/security.config");
-const jwtModule = jwt_1.JwtModule.registerAsync({
-    imports: [config_1.ConfigModule],
-    useFactory: async (configservice) => ({
-        secret: configservice.get((0, security_config_1.getSecurityConfigName)()).jwtSecret,
-        signOptions: { expiresIn: "100s" }
-    }),
-    inject: [config_1.ConfigService]
-});
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [jwtModule]
+        imports: [
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (configService) => ({
+                    secret: configService.get('ACCESS_TOKEN_SECRET_KEY') || 'default_secret',
+                    signOptions: { expiresIn: "100s" }
+                }),
+                inject: [config_1.ConfigService]
+            })
+        ],
+        providers: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

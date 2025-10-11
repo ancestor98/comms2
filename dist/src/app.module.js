@@ -20,6 +20,7 @@ const nestjs_pino_1 = require("nestjs-pino");
 const config_1 = require("@nestjs/config");
 const sentry_config_1 = require("./config/sentry.config");
 const sentry_traker_service_1 = require("./utility/sentry-traker.service ");
+const auth_module_1 = require("./auth/auth.module");
 const upload_module_1 = require("./upload/upload.module");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const event_util_1 = require("./utility/event.util");
@@ -58,6 +59,7 @@ exports.AppModule = AppModule = __decorate([
                     }
                 }
             }),
+            auth_module_1.AuthModule,
             upload_module_1.UploadModule
         ],
         controllers: [],

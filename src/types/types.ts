@@ -4,3 +4,4 @@ export type SecurityConfig= {
     
 
 }
+export type RecordId = string | number;

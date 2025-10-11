@@ -1,44 +1,42 @@
-// import { Injectable } from '@nestjs/common';
-// //import { CreateAuthDto } from './dto/validators';
-// import { UpdateAuthDto } from './dto/update-auth.dto';
-// import { isValidEmail } from 'src/utility/helper.util';
-// import dayjs, { Dayjs } from 'dayjs';
-// import { normalizePhoneNumber } from 'src/utility/phone.util';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { RecordId, SecurityConfig } from "src/types/types";
 
-// @Injectable()
-// export class AuthService {
+@Injectable()
+export class AuthService{
+    constructor(
+        private jwtservice:JwtService,
+        private configservice:ConfigService
 
-//   async forgotPassword(identifier: string) {
-//     try{
-//       const key= isValidEmail(identifier)?"email":"phone"
-//       //Normalize phone number if it phone
-//       let normalizedidentifier= identifier
-//       if(key ==="phone"){
-//           const startTime = dayjs().valueOf();
-//           try{
-//             normalizedidentifier= normalizePhoneNumber(identifier)
-//             const duration= dayjs.valueOf()-startTime;
-//             await this
-//           }
+    ){}
+// Generate access token for a specific user
+    async creatAccessToken(userId:RecordId):Promise<string>{
+        const payload={
+            sub:userId,
+        };
+        return this.jwtservice.sign(payload)
 
-//       }
-//     }
-//     return 'This action adds a new auth';
-//   }
+    }
 
-//   findAll() {
-//     return `This action returns all auth`;
-//   }
+  // Generate access token with custom payload and optional expiry
+    async generateAccessToken(payload:any,expires?:string):Promise<string>{
+        const options:{expiresIn?:any}={}
+        if(expires){
+            options.expiresIn=expires
+        }return this.jwtservice.sign(payload,options)
+     }
 
-//   findOne(id: number) {
-//     return `This action returns a #${id} auth`;
-//   }
+     async verifyToken(token:string):Promise<{sub:RecordId}>{
+        return await this.jwtservice.verifyAsync(token,
+            {//secret: this.Configservice.get<SecurityConfig>("security").jwtSecret
+                 secret: this.configservice.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+                }
 
-//   update(id: number, updateAuthDto: UpdateAuthDto) {
-//     return `This action updates a #${id} auth`;
-//   }
+        )
 
-//   remove(id: number) {
-//     return `This action removes a #${id} auth`;
-//   }
-// }
+     }
+
+
+
+}
